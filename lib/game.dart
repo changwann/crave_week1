@@ -19,6 +19,7 @@ class _GameScreenState extends State<GameScreen> {
   String currentQuestion = '';
   List<String> currentAnswers = [];
   String correctAnswer = '';
+  int correctCount = 0; // Add this to count correct answers
 
   @override
   void initState() {
@@ -45,9 +46,13 @@ class _GameScreenState extends State<GameScreen> {
       );
       // Correct answer, show next question
       setState(() {
+        correctCount += 10; // Increase the correct count
         setQuestion();
       });
     } else {
+      setState(() {
+        correctCount = max(0, correctCount - 5); // Decrease the correct count
+      });
       // Wrong answer, show game over screen or some kind of feedback
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -69,8 +74,14 @@ class _GameScreenState extends State<GameScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
+              '현재 점수: $correctCount', // Show the correct count
+              style: TextStyle(fontSize: 24),
+            ),
+            Text(
               currentQuestion,
-              style: TextStyle(fontSize: 50), // Increase the font size
+              style: TextStyle(
+                  fontSize: 50,
+                  fontWeight: FontWeight.bold), // Increase the font size
             ),
             SizedBox(height: 50), // Add some space
             ...currentAnswers.map((answer) {
@@ -81,7 +92,9 @@ class _GameScreenState extends State<GameScreen> {
                   width: 400, // Make buttons have same width
                   height: 60,
                   child: ElevatedButton(
-                    child: Text(answer),
+                    child: Text(answer,
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold)),
                     onPressed: () => checkAnswer(answer),
                   ),
                 ),

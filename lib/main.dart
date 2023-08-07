@@ -46,7 +46,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('영단어 학습 앱'),
+        title: const Text(
+          '영단어 학습 앱',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
       body: _widgetOptions.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
