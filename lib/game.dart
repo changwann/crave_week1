@@ -29,23 +29,32 @@ class _GameScreenState extends State<GameScreen> {
   void setQuestion() {
     currentQuestion =
         questions.keys.elementAt(Random().nextInt(questions.length));
-    correctAnswer = questions[currentQuestion]![0];
-    currentAnswers = questions[currentQuestion]!;
-    currentAnswers.shuffle();
+    currentAnswers =
+        List<String>.from(questions[currentQuestion]!); // Copy the list
+    correctAnswer = currentAnswers[0]; // Set the correct answer
+    currentAnswers.shuffle(); // Shuffle after setting the correct answer
   }
 
   void checkAnswer(String answer) {
     if (answer == correctAnswer) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('정답입니다!'),
+          duration: Duration(milliseconds: 400),
+        ),
+      );
       // Correct answer, show next question
       setState(() {
         setQuestion();
       });
     } else {
       // Wrong answer, show game over screen or some kind of feedback
-      // For simplicity, here we just shuffle the answers again
-      setState(() {
-        currentAnswers.shuffle();
-      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('틀린 답변입니다. 다시 시도해주세요.'),
+          duration: Duration(milliseconds: 400),
+        ),
+      );
     }
   }
 
@@ -59,11 +68,23 @@ class _GameScreenState extends State<GameScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('단어: $currentQuestion'),
+            Text(
+              currentQuestion,
+              style: TextStyle(fontSize: 50), // Increase the font size
+            ),
+            SizedBox(height: 50), // Add some space
             ...currentAnswers.map((answer) {
-              return ElevatedButton(
-                child: Text(answer),
-                onPressed: () => checkAnswer(answer),
+              return Padding(
+                padding: const EdgeInsets.symmetric(
+                    vertical: 10), // Add some space between buttons
+                child: SizedBox(
+                  width: 400, // Make buttons have same width
+                  height: 60,
+                  child: ElevatedButton(
+                    child: Text(answer),
+                    onPressed: () => checkAnswer(answer),
+                  ),
+                ),
               );
             }).toList(),
           ],
