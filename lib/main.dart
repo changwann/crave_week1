@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'timer.dart';
 import 'score.dart';
 import 'settings.dart';
+import 'game.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,8 +15,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: HomeScreen(),
+    return ScoreNotifier(
+      scores: [],
+      child: MaterialApp(
+        title: 'My App',
+        home: HomeScreen(),
+      ),
     );
   }
 }

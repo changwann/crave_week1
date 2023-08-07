@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'dart:async';
+
+//import 'main.dart';
+//import 'score.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({Key? key}) : super(key: key);
@@ -16,6 +20,8 @@ class _GameScreenState extends State<GameScreen> {
     'Grape': ['포도', '바나나', '딸기', '사과'],
   };
 
+  late Timer _timer;
+  int _start = 3; // 처음 시작 시간 조절하는 곳
   String currentQuestion = '';
   List<String> currentAnswers = [];
   String correctAnswer = '';
@@ -24,7 +30,48 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void initState() {
     super.initState();
+    startTimer();
     setQuestion();
+  }
+
+  void startTimer() {
+    _timer = Timer.periodic(
+      Duration(seconds: 1),
+      (Timer timer) {
+        if (_start == 0) {
+          setState(() {
+            timer.cancel();
+            showGameOverScreen();
+          });
+        } else {
+          setState(() {
+            _start--;
+          });
+        }
+      },
+    );
+  }
+
+  void showGameOverScreen() {
+    ScoreNotifier.of(context)?.addScore(correctCount);
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('게임 종료'),
+          content: Text('당신의 최종 점수는 $correctCount 입니다.'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('돌아가기'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void setQuestion() {
@@ -37,6 +84,10 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void checkAnswer(String answer) {
+    if (_start == 0) {
+      return;
+    }
+
     if (answer == correctAnswer) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -46,7 +97,7 @@ class _GameScreenState extends State<GameScreen> {
       );
       // Correct answer, show next question
       setState(() {
-        correctCount += 10; // Increase the correct count
+        correctCount += 10; // Increase the correct count // Reset the timer
         setQuestion();
       });
     } else {
@@ -64,6 +115,12 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -77,6 +134,20 @@ class _GameScreenState extends State<GameScreen> {
               '현재 점수: $correctCount', // Show the correct count
               style: TextStyle(fontSize: 24),
             ),
+            SizedBox(height: 20),
+            SizedBox(
+              height: 10,
+              child: LinearProgressIndicator(
+                value: _start / 60, // Show the percentage of time left
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+              ),
+            ),
+            SizedBox(height: 20), // Add some space
+            Text(
+              '남은 시간: $_start', // Show the correct count
+              style: TextStyle(fontSize: 24),
+            ),
+            SizedBox(height: 50),
             Text(
               currentQuestion,
               style: TextStyle(
@@ -104,5 +175,28 @@ class _GameScreenState extends State<GameScreen> {
         ),
       ),
     );
+  }
+}
+
+class ScoreNotifier extends InheritedWidget {
+  final List<int> scores;
+
+  const ScoreNotifier({
+    Key? key,
+    required Widget child,
+    required this.scores,
+  }) : super(key: key, child: child);
+
+  void addScore(int score) {
+    scores.add(score);
+  }
+
+  @override
+  bool updateShouldNotify(InheritedWidget oldWidget) {
+    return true;
+  }
+
+  static ScoreNotifier? of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<ScoreNotifier>();
   }
 }
