@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'game.dart';
+import 'package:flutter_week1/wrong.dart';
+import 'package:flutter_week1/game.dart';
 
 class TimerScreen extends StatelessWidget {
   const TimerScreen({Key? key}) : super(key: key);
@@ -23,6 +24,22 @@ class TimerScreen extends StatelessWidget {
               );
             },
             child: Text('게임 시작', style: TextStyle(fontSize: 20)),
+          ),
+          SizedBox(height: 20),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color.fromARGB(255, 255, 107, 97),
+              minimumSize: Size(200, 60), // Set the minimum size of the button
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        WrongScreen(wrongWords: globalWrongWords)),
+              );
+            },
+            child: Text('틀린 단어 모아보기', style: TextStyle(fontSize: 20)),
           ),
         ],
       ),

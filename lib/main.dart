@@ -70,7 +70,7 @@ class HomeScreenState extends State<HomeScreen> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.timer),
-            label: '타이머',
+            label: '게임',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.score),

@@ -8,6 +8,8 @@ import 'package:flutter/services.dart';
 
 import 'settings.dart';
 
+List<Map<String, String>> globalWrongWords = [];
+
 Future<Map<String, List<String>>> loadQuestions(String difficulty) async {
   String fileName =
       difficulty == "Easy" ? 'questions_easy.json' : 'questions_hard.json';
@@ -26,6 +28,8 @@ class GameScreen extends StatefulWidget {
 class GameScreenState extends State<GameScreen> {
   // Sample question and answer data
   late Map<String, List<String>> questions;
+  // 틀린 단어와 올바른 답변을 저장할 변수 추가
+  List<Map<String, String>> wrongWords = [];
 
   late Timer _timer;
   int _start = 60; // 처음 시작 시간 조절하는 곳
@@ -89,10 +93,18 @@ class GameScreenState extends State<GameScreen> {
   }
 
   void setQuestion() {
-    currentQuestion =
-        questions.keys.elementAt(Random().nextInt(questions.length));
-    currentAnswers =
-        List<String>.from(questions[currentQuestion]!); // Copy the list
+    if (questions.isEmpty) {
+      showGameOverScreen();
+      return;
+    }
+
+    int randomIndex = Random().nextInt(questions.length);
+    currentQuestion = questions.keys.elementAt(randomIndex);
+    currentAnswers = List<String>.from(questions[currentQuestion]!);
+
+    // 이제 해당 질문을 목록에서 제거합니다.
+    questions.remove(currentQuestion);
+
     correctAnswer = currentAnswers[0]; // Set the correct answer
     currentAnswers.shuffle(); // Shuffle after setting the correct answer
   }
@@ -112,13 +124,17 @@ class GameScreenState extends State<GameScreen> {
       );
       // Correct answer, show next question
       setState(() {
-        settings.difficulty == "easy"
+        settings.difficulty == "Easy"
             ? correctCount += 10
             : correctCount +=
                 50; // Increase the correct count // Reset the timer
         setQuestion();
       });
     } else {
+      if (!wrongWords.any((word) => word.containsKey(currentQuestion))) {
+        wrongWords.add({currentQuestion: correctAnswer});
+      }
+      globalWrongWords = wrongWords;
       setState(() {
         correctCount = max(0, correctCount - 5); // Decrease the correct count
       });
