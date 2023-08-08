@@ -39,6 +39,11 @@ class HomeScreen extends StatefulWidget {
 class HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
+  @override
+  void initState() {
+    super.initState();
+  }
+
   static final List<Widget> _widgetOptions = <Widget>[
     TimerScreen(),
     ScoreScreen(),

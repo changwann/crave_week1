@@ -28,7 +28,7 @@ class GameScreenState extends State<GameScreen> {
   late Map<String, List<String>> questions;
 
   late Timer _timer;
-  int _start = 3; // 처음 시작 시간 조절하는 곳
+  int _start = 60; // 처음 시작 시간 조절하는 곳
   String currentQuestion = '';
   List<String> currentAnswers = [];
   String correctAnswer = '';
@@ -40,7 +40,6 @@ class GameScreenState extends State<GameScreen> {
     startTimer();
 
     final settings = Provider.of<SettingsModel>(context, listen: false);
-
     loadQuestions(settings.difficulty).then((loadedQuestions) {
       setState(() {
         questions = loadedQuestions;
@@ -99,6 +98,7 @@ class GameScreenState extends State<GameScreen> {
   }
 
   void checkAnswer(String answer) {
+    final settings = Provider.of<SettingsModel>(context, listen: false);
     if (_start == 0) {
       return;
     }
@@ -112,7 +112,10 @@ class GameScreenState extends State<GameScreen> {
       );
       // Correct answer, show next question
       setState(() {
-        correctCount += 10; // Increase the correct count // Reset the timer
+        settings.difficulty == "easy"
+            ? correctCount += 10
+            : correctCount +=
+                50; // Increase the correct count // Reset the timer
         setQuestion();
       });
     } else {

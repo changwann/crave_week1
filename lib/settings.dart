@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 
 class SettingsModel extends ChangeNotifier {
@@ -49,10 +48,13 @@ class SettingsScreenState extends State<SettingsScreen> {
           title: Text('영단어 난이도'),
           trailing: DropdownButton<String>(
             value: settings.difficulty,
+            underline:
+                Container(height: 2, color: Theme.of(context).primaryColor),
             items: <String>['Easy', 'Hard'].map((String value) {
               return DropdownMenuItem<String>(
                 value: value,
-                child: Text(value),
+                child: Text(value,
+                    style: TextStyle(backgroundColor: Colors.transparent)),
               );
             }).toList(),
             onChanged: (value) {
