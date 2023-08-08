@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:tuple/tuple.dart';
 import 'dart:math';
 import 'dart:async';
-
-//import 'main.dart';
-//import 'score.dart';
+import 'package:provider/provider.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({Key? key}) : super(key: key);
 
   @override
-  _GameScreenState createState() => _GameScreenState();
+  GameScreenState createState() => GameScreenState();
 }
 
-class _GameScreenState extends State<GameScreen> {
+class GameScreenState extends State<GameScreen> {
   // Sample question and answer data
   final Map<String, List<String>> questions = {
     'Apple': ['사과', '바나나', '딸기', '포도'],
@@ -53,7 +52,7 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void showGameOverScreen() {
-    ScoreNotifier.of(context)?.addScore(correctCount);
+    Provider.of<ScoreNotifier>(context, listen: false).addScore(correctCount);
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -178,25 +177,13 @@ class _GameScreenState extends State<GameScreen> {
   }
 }
 
-class ScoreNotifier extends InheritedWidget {
-  final List<int> scores;
+class ScoreNotifier extends ChangeNotifier {
+  final List<Tuple2<int, DateTime>> _scores = [];
 
-  const ScoreNotifier({
-    Key? key,
-    required Widget child,
-    required this.scores,
-  }) : super(key: key, child: child);
+  List<Tuple2<int, DateTime>> get scores => _scores;
 
   void addScore(int score) {
-    scores.add(score);
-  }
-
-  @override
-  bool updateShouldNotify(InheritedWidget oldWidget) {
-    return true;
-  }
-
-  static ScoreNotifier? of(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<ScoreNotifier>();
+    _scores.add(Tuple2(score, DateTime.now()));
+    notifyListeners();
   }
 }
