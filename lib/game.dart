@@ -3,6 +3,18 @@ import 'package:tuple/tuple.dart';
 import 'dart:math';
 import 'dart:async';
 import 'package:provider/provider.dart';
+import 'dart:convert';
+import 'package:flutter/services.dart';
+
+import 'settings.dart';
+
+Future<Map<String, List<String>>> loadQuestions(String difficulty) async {
+  String fileName =
+      difficulty == "Easy" ? 'questions_easy.json' : 'questions_hard.json';
+  String jsonString = await rootBundle.loadString('assets/$fileName');
+  Map<String, dynamic> jsonData = jsonDecode(jsonString);
+  return jsonData.map((key, value) => MapEntry(key, List<String>.from(value)));
+}
 
 class GameScreen extends StatefulWidget {
   const GameScreen({Key? key}) : super(key: key);
@@ -13,11 +25,7 @@ class GameScreen extends StatefulWidget {
 
 class GameScreenState extends State<GameScreen> {
   // Sample question and answer data
-  final Map<String, List<String>> questions = {
-    'Apple': ['사과', '바나나', '딸기', '포도'],
-    'Banana': ['바나나', '사과', '멜론', '참외'],
-    'Grape': ['포도', '바나나', '딸기', '사과'],
-  };
+  late Map<String, List<String>> questions;
 
   late Timer _timer;
   int _start = 3; // 처음 시작 시간 조절하는 곳
@@ -30,7 +38,15 @@ class GameScreenState extends State<GameScreen> {
   void initState() {
     super.initState();
     startTimer();
-    setQuestion();
+
+    final settings = Provider.of<SettingsModel>(context, listen: false);
+
+    loadQuestions(settings.difficulty).then((loadedQuestions) {
+      setState(() {
+        questions = loadedQuestions;
+        setQuestion();
+      });
+    });
   }
 
   void startTimer() {
